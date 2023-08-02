@@ -1,9 +1,9 @@
 <div class="flex justify-center">
 <ul class="flex flex-col">
   <li *ngFor="let user of users" class="justify-center text-center py-2 text-xl">
-    <a [routerLink]="['chat/',user.id]">
+    <button (click)="getChatRoomId(currentUserId, user.id)">
 {{user.username}}
-    </a>
+    </button>
   </li>
 </ul>
 </div>

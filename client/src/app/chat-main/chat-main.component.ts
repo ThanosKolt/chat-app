@@ -10,12 +10,7 @@ import { User } from 'src/types';
 })
 export class ChatMainComponent {
   @Input('id') roomId?: string;
-  // id(userId: string) {
-  //   this.userService.getUser(userId).subscribe(({ id, username }) => {
-  //     this.toUser = { id, username };
-  //   });
-  //   this.chatService.joinRoom(userId);
-  // }
+
   toUser: User | undefined;
   newMessage: string = '';
   messageList: string[] = [];
@@ -26,22 +21,10 @@ export class ChatMainComponent {
   ) {}
 
   ngOnInit() {
-    // this.chatService.getNewMessage().subscribe((message: string) => {
-    //   this.messageList.push(message);
-    // });
-
-    // this.chatService.message$.subscribe((message) => {
-    //   this.messageList.push(message);
-    // });
-
     this.chatService.getNewMessage().subscribe((message) => {
       this.messageList.push(message);
     });
     if (this.roomId !== undefined) {
-      this.userService.getUser(this.roomId).subscribe(({ id, username }) => {
-        this.toUser = { id, username };
-      });
-
       this.chatService.joinRoom(this.roomId);
     }
 

@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { UserService } from '../user.service';
 import { User } from 'src/types';
+import { ChatService } from '../chat.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-chat-list',
@@ -9,12 +11,20 @@ import { User } from 'src/types';
   styleUrls: ['./chat-list.component.css'],
 })
 export class ChatListComponent {
+  currentUserId: number = -1;
   users: User[] = [];
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private chatService: ChatService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.getUsers();
+    if (localStorage.getItem('currentUserId') !== null) {
+      this.currentUserId = Number(localStorage.getItem('currentUserId'))!;
+    }
   }
 
   getUsers() {
@@ -24,6 +34,24 @@ export class ChatListComponent {
       },
       error: (error) => {
         console.log(error.message);
+      },
+    });
+  }
+
+  getChatRoomId(userAId: number, userBId: number) {
+    this.chatService.getRoomId(userAId, userBId).subscribe({
+      next: ({ roomId }) => {
+        this.router.navigate(['/chat/', roomId]);
+      },
+      error: (error) => {
+        if (error.status === 404) {
+          this.chatService.createChatRoom(userAId, userBId).subscribe({
+            next: ({ roomId }) => {
+              this.router.navigate(['/chat/', roomId]);
+            },
+            error: (error) => console.error(error.message),
+          });
+        }
       },
     });
   }
