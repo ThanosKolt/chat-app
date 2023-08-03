@@ -45,14 +45,20 @@ export class ChatListComponent {
       },
       error: (error) => {
         if (error.status === 404) {
-          this.chatService.createChatRoom(userAId, userBId).subscribe({
-            next: ({ roomId }) => {
-              this.router.navigate(['/chat/', roomId]);
-            },
-            error: (error) => console.error(error.message),
-          });
+          this.createRoom(userAId, userBId);
+          return;
         }
+        console.error(error.message);
       },
+    });
+  }
+
+  createRoom(userAId: number, userBId: number) {
+    this.chatService.createChatRoom(userAId, userBId).subscribe({
+      next: ({ roomId }) => {
+        this.router.navigate(['/chat/', roomId]);
+      },
+      error: (error) => console.error(error.message),
     });
   }
 }
