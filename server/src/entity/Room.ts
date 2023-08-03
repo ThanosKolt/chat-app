@@ -1,34 +1,30 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { RoomUser } from "./RoomUser";
 import { RoomMessage } from "./RoomMessage";
 
 @Entity()
-export class User {
+export class Room {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  username: string;
-
-  @Column({ select: false })
-  password: string;
+  @Column()
+  isGroup: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
-
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => RoomUser, (roomUser) => roomUser.user)
-  rooms: RoomUser[];
+  @OneToMany(() => RoomUser, (roomUser) => roomUser.room)
+  users: RoomUser[];
 
-  @OneToMany(() => RoomMessage, (roomMessage) => roomMessage.user)
+  @OneToMany(() => RoomMessage, (roomMessage) => roomMessage.chatRoom)
   messages: RoomMessage[];
 }

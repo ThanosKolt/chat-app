@@ -10,6 +10,7 @@ import {
   JoinTable,
   ManyToMany,
 } from "typeorm";
+
 import { User } from "./User";
 
 @Entity()
