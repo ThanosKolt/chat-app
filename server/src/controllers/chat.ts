@@ -21,13 +21,7 @@ export const createRoom = async (req: Request, res: Response) => {
   const isSelf = userAId === userBId;
   const randomRoomId = rm({ min: 1000000000, max: 2147483646, integer: true });
   try {
-    const chatRoomExists = await manager.findOne(ChatRoomRelation, {
-      where: {
-        userAId: userAId || userBId,
-        userBId: userAId || userBId,
-        isSelf,
-      },
-    });
+    const chatRoomExists = await returnChatRoom(userAId,userBId,isSelf);
     if (chatRoomExists !== null) {
       res.status(status.BAD_REQUEST).json({
         error: {
@@ -42,13 +36,7 @@ export const createRoom = async (req: Request, res: Response) => {
       isSelf,
       roomId: randomRoomId,
     });
-    const chatRoom = await manager.findOne(ChatRoomRelation, {
-      where: {
-        userAId: userAId || userBId,
-        userBId: userAId || userBId,
-        isSelf,
-      },
-    });
+    const chatRoom = await returnChatRoom(userAId,userBId,isSelf);
     if (chatRoom) {
       res.status(status.CREATED).json({ roomId: chatRoom.roomId });
     }
@@ -72,13 +60,7 @@ export const getChatRoomId = async (req: Request, res: Response) => {
     return;
   }
   try {
-    const chatRoom = await chatRepository
-      .createQueryBuilder("chat")
-      .select()
-      .where("chat.userAId = :userAId OR chat.userAId = :userBId")
-      .where("chat.userBId = :userAId OR chat.userBId = :userBId")
-      .where("chat.isSelf = :isSelf").setParameters({userAId, userBId, isSelf})
-      .getOne();
+    const chatRoom = await returnChatRoom(userAId,userBId,isSelf);
     if (!chatRoom) {
       res.status(status.NOT_FOUND).json({
         error: {
@@ -94,3 +76,13 @@ export const getChatRoomId = async (req: Request, res: Response) => {
       .json({ error: { msg: "Something wen't wrong, please try again." } });
   }
 };
+
+const returnChatRoom = (userAId:number, userBId:number, isSelf:boolean)=>{
+  return chatRepository
+    .createQueryBuilder("chat")
+    .select()
+    .where("chat.userAId = :userAId OR chat.userAId = :userBId")
+    .where("chat.userBId = :userAId OR chat.userBId = :userBId")
+    .where("chat.isSelf = :isSelf").setParameters({userAId, userBId, isSelf})
+    .getOne();
+}
