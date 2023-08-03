@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import { ChatRoomRelation } from "../entity/ChatRoomRelation";
-import status, { BAD_REQUEST } from "http-status";
+import status from "http-status";
 import rm from "random-number";
 
 const manager = AppDataSource.manager;
@@ -75,15 +75,9 @@ export const getChatRoomId = async (req: Request, res: Response) => {
     const chatRoom = await chatRepository
       .createQueryBuilder("chat")
       .select()
-      .where("chat.userAId = :userAId OR chat.userAId = :userBId", {
-        userAId,
-        userBId,
-      })
-      .where("chat.userBId = :userAId OR chat.userBId = :userBId", {
-        userAId,
-        userBId,
-      })
-      .where("chat.isSelf = :isSelf", { isSelf })
+      .where("chat.userAId = :userAId OR chat.userAId = :userBId")
+      .where("chat.userBId = :userAId OR chat.userBId = :userBId")
+      .where("chat.isSelf = :isSelf").setParameters({userAId, userBId, isSelf})
       .getOne();
     if (!chatRoom) {
       res.status(status.NOT_FOUND).json({

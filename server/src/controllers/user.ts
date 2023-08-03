@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
-import status, { BAD_REQUEST } from "http-status";
+import status  from "http-status";
 import { generateToken } from "../utils/jwt";
 
 interface RequestBody<T> extends Express.Request {
@@ -94,7 +94,7 @@ export const register = async (req: RequestBody<Register>, res: Response) => {
 export const login = async (req: RequestBody<Register>, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    res.status(BAD_REQUEST).json({ error: { msg: "Invalid Credentials" } });
+    res.status(status.BAD_REQUEST).json({ error: { msg: "Invalid Credentials" } });
     return;
   }
   const user = await manager.findOne(User, {
