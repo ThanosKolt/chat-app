@@ -3,8 +3,7 @@ import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import { Room } from "../entity/Room";
 import { StatusCodes } from "http-status-codes";
-import rm from "random-number";
-import { FindOperator, In, Not } from "typeorm";
+import { In, Not } from "typeorm";
 
 const manager = AppDataSource.manager;
 
@@ -73,7 +72,7 @@ export const getRoomId = async (req: Request, res: Response) => {
       });
       return;
     }
-    res.status(StatusCodes.OK).json({ roomId: room.id });
+    res.status(StatusCodes.OK).json({ roomId: room.id, users: room.users });
   } catch (error) {
     res
       .status(StatusCodes.BAD_REQUEST)
@@ -104,6 +103,38 @@ export const getRoomsByUser = async (req: Request, res: Response) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: { msg: "Something wen't wrong" } });
+  }
+};
+
+export const getRoomInfo = async (req: Request, res: Response) => {
+  const roomId = Number(req.body.roomId);
+  if (!roomId) {
+    res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: { msg: `You need to provide a roomId` } });
+    return;
+  }
+  try {
+    const room = await roomRepository.findOne({
+      relations: { users: true },
+      where: { id: roomId },
+    });
+    if (room !== null) {
+      const userResult = room.users.map((user) => {
+        return { id: user.id, username: user.username };
+      });
+      res.status(StatusCodes.OK).json({ roomId: room.id, users: userResult });
+      return;
+    }
+    res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ msg: `Room with id: ${roomId} not found` });
+    return;
+  } catch (error) {
+    console.error(error.message);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something went wrong" } });
   }
 };
 

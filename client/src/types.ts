@@ -31,3 +31,11 @@ export interface GetRoomsByUserReponse {
     username: string;
   };
 }
+
+export interface GetRoomInfoResponse {
+  roomId: number;
+  users: Array<{
+    id: number;
+    username: string;
+  }>;
+}

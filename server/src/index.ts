@@ -38,9 +38,11 @@ io.on("connection", (socket) => {
     console.log("user joined " + roomId);
   });
 
-  socket.on("message", (roomId, message) => {
-    io.to(roomId).emit("message", `${socket.id} said ${message}`);
-    console.log(`message: ${message}, room: ${roomId}`);
+  socket.on("message", (roomId, fromUserId, toUserId, message) => {
+    io.to(roomId).emit(
+      "message",
+      `from: ${fromUserId},to: ${toUserId}, message: ${message}, room: ${roomId}`
+    );
   });
 
   socket.on("disconnect", () => {

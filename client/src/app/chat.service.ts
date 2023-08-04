@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
-import { GetRoomsByUserReponse } from 'src/types';
+import { GetRoomInfoResponse, GetRoomsByUserReponse } from 'src/types';
 
 @Injectable({
   providedIn: 'root',
@@ -24,8 +24,13 @@ export class ChatService {
 
   socket = io('http://localhost:5000');
 
-  public sendMessage(roomId: string, message: string) {
-    this.socket.emit('message', roomId, message);
+  public sendMessage(
+    roomId: string,
+    fromId: number,
+    toId: number,
+    message: string
+  ) {
+    this.socket.emit('message', roomId, fromId, toId, message);
   }
 
   public getNewMessage() {
@@ -67,6 +72,12 @@ export class ChatService {
         userId,
       }
     );
+  }
+
+  public getRoomInfo(roomId: string): Observable<GetRoomInfoResponse> {
+    return this.http.post<GetRoomInfoResponse>(this.baseUrl + 'getRoomInfo', {
+      roomId,
+    });
   }
   // public getNewMessage() {
   // this.socket.on('message', (message) => {

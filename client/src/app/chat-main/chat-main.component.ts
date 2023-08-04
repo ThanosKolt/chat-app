@@ -11,7 +11,12 @@ import { User } from 'src/types';
 export class ChatMainComponent {
   @Input('id') roomId?: string;
 
-  toUser: User | undefined;
+  toUser: {
+    id: number;
+    username: string;
+  } = { id: -1, username: '' };
+  currentUserId: number = -1;
+  currentUserUsername: string = '';
   newMessage: string = '';
   messageList: string[] = [];
 
@@ -27,15 +32,42 @@ export class ChatMainComponent {
     if (this.roomId !== undefined) {
       this.chatService.joinRoom(this.roomId);
     }
+    if (
+      localStorage.getItem('currentUserId') !== null &&
+      localStorage.getItem('currentUserUsername') !== null
+    ) {
+      this.currentUserId = Number(localStorage.getItem('currentUserId'));
+      this.currentUserUsername = localStorage.getItem('currentUserUsername')!;
+    }
 
-    console.log(this.roomId);
+    this.getToUserId();
   }
 
   sendMessage() {
     if (this.newMessage.trim().length > 0 && this.roomId !== undefined) {
-      this.chatService.sendMessage(this.roomId, this.newMessage);
+      this.chatService.sendMessage(
+        this.roomId,
+        this.currentUserId,
+        this.toUser.id,
+        this.newMessage
+      );
       console.log(this.roomId);
     }
     this.newMessage = '';
+  }
+
+  getToUserId() {
+    if (this.roomId !== undefined) {
+      this.chatService.getRoomInfo(this.roomId).subscribe({
+        next: (data) => {
+          data.users.forEach((user) => {
+            if (user.id !== this.currentUserId) {
+              this.toUser.id = user.id;
+              this.toUser.username = user.username;
+            }
+          });
+        },
+      });
+    }
   }
 }
