@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
+import { GetRoomsByUserReponse } from 'src/types';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +60,14 @@ export class ChatService {
     });
   }
 
+  public getRoomsByUser(userId: number): Observable<GetRoomsByUserReponse[]> {
+    return this.http.post<GetRoomsByUserReponse[]>(
+      this.baseUrl + 'getRoomsByUser',
+      {
+        userId,
+      }
+    );
+  }
   // public getNewMessage() {
   // this.socket.on('message', (message) => {
   // this.message$.next(message);

@@ -23,3 +23,11 @@ export interface LoginResponse {
   };
   token: string;
 }
+
+export interface GetRoomsByUserReponse {
+  roomId: number;
+  user: {
+    id: number;
+    username: string;
+  };
+}
