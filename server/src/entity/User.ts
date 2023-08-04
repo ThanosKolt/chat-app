@@ -5,9 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
-import { RoomUser } from "./RoomUser";
-import { RoomMessage } from "./RoomMessage";
+import { Room } from "./Room";
 
 @Entity()
 export class User {
@@ -26,9 +27,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => RoomUser, (roomUser) => roomUser.user)
-  rooms: RoomUser[];
-
-  @OneToMany(() => RoomMessage, (roomMessage) => roomMessage.user)
-  messages: RoomMessage[];
+  @ManyToMany(() => Room, (room) => room.users)
+  rooms: Room[];
 }

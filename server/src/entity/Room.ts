@@ -2,29 +2,31 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { RoomUser } from "./RoomUser";
-import { RoomMessage } from "./RoomMessage";
+import { User } from "./User";
 
 @Entity()
 export class Room {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: false })
   isGroup: boolean;
+
+  @Column({ default: false })
+  isSelf: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => RoomUser, (roomUser) => roomUser.room)
-  users: RoomUser[];
-
-  @OneToMany(() => RoomMessage, (roomMessage) => roomMessage.chatRoom)
-  messages: RoomMessage[];
+  @ManyToMany(() => User, (users) => users.rooms, { cascade: true })
+  @JoinTable()
+  users: User[];
 }
