@@ -8,6 +8,7 @@ import chatRouter from "./routes/chatRoute";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { Message } from "./types";
 
 const app = express();
 const server = createServer(app);
@@ -38,11 +39,9 @@ io.on("connection", (socket) => {
     console.log("user joined " + roomId);
   });
 
-  socket.on("message", (roomId, fromUserId, toUserId, message) => {
-    io.to(roomId).emit(
-      "message",
-      `from: ${fromUserId},to: ${toUserId}, message: ${message}, room: ${roomId}`
-    );
+  socket.on("message", ({ fromId, roomId, text, toId }: Message) => {
+    io.to(roomId).emit("message", { text, fromId, toId, roomId });
+    console.log(fromId, toId, roomId, text);
   });
 
   socket.on("disconnect", () => {

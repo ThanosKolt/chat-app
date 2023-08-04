@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { UserService } from '../user.service';
-import { User } from 'src/types';
+import { Message } from 'src/types';
 
 @Component({
   selector: 'app-chat-main',
@@ -18,7 +18,7 @@ export class ChatMainComponent {
   currentUserId: number = -1;
   currentUserUsername: string = '';
   newMessage: string = '';
-  messageList: string[] = [];
+  messageList: Message[] = [];
 
   constructor(
     private chatService: ChatService,
@@ -28,7 +28,9 @@ export class ChatMainComponent {
   ngOnInit() {
     this.chatService.getNewMessage().subscribe((message) => {
       this.messageList.push(message);
+      console.log(message);
     });
+
     if (this.roomId !== undefined) {
       this.chatService.joinRoom(this.roomId);
     }
@@ -45,13 +47,18 @@ export class ChatMainComponent {
 
   sendMessage() {
     if (this.newMessage.trim().length > 0 && this.roomId !== undefined) {
-      this.chatService.sendMessage(
+      console.log(
         this.roomId,
         this.currentUserId,
         this.toUser.id,
         this.newMessage
       );
-      console.log(this.roomId);
+      this.chatService.sendMessage({
+        roomId: this.roomId,
+        fromId: this.currentUserId,
+        toId: this.toUser.id,
+        text: this.newMessage,
+      });
     }
     this.newMessage = '';
   }
