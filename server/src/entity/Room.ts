@@ -1,12 +1,11 @@
 import {
+  Entity,
+  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { User } from "./User";
 
@@ -15,18 +14,19 @@ export class Room {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: false })
-  isGroup: boolean;
+  @ManyToMany(() => User)
+  @JoinTable()
+  users: User[];
 
-  @Column({ default: false })
+  @OneToMany(() => Message, (message) => message.room)
+  messages: Message[];
+
+  @Column()
   isSelf: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
+
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToMany(() => User, (users) => users.rooms, { cascade: true })
-  @JoinTable()
-  users: User[];
 }

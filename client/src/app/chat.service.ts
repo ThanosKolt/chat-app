@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
+import { GetRoomInfoResponse, GetRoomsByUserReponse } from 'src/types';
+import { Message } from '../types';
 
 @Injectable({
   providedIn: 'root',
@@ -17,19 +19,19 @@ export class ChatService {
 
   // public newMessage = new Subject<string>();
   baseUrl = 'http://localhost:5000/api/chat/';
-  newMessage = new Subject<string>();
+  newMessage = new Subject<Message>();
 
   constructor(private http: HttpClient) {}
 
   socket = io('http://localhost:5000');
 
-  public sendMessage(roomId: string, message: string) {
-    this.socket.emit('message', roomId, message);
+  public sendMessage(message: Message) {
+    this.socket.emit('message', message);
   }
 
   public getNewMessage() {
-    this.socket.on('message', (message) => {
-      this.newMessage.next(message);
+    this.socket.on('message', (newMessage: Message) => {
+      this.newMessage.next(newMessage);
     });
 
     return this.newMessage;
@@ -59,6 +61,20 @@ export class ChatService {
     });
   }
 
+  public getRoomsByUser(userId: number): Observable<GetRoomsByUserReponse[]> {
+    return this.http.post<GetRoomsByUserReponse[]>(
+      this.baseUrl + 'getRoomsByUser',
+      {
+        userId,
+      }
+    );
+  }
+
+  public getRoomInfo(roomId: string): Observable<GetRoomInfoResponse> {
+    return this.http.post<GetRoomInfoResponse>(this.baseUrl + 'getRoomInfo', {
+      roomId,
+    });
+  }
   // public getNewMessage() {
   // this.socket.on('message', (message) => {
   // this.message$.next(message);

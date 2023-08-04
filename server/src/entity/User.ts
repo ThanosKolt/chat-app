@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  JoinColumn,
   ManyToMany,
   JoinTable,
 } from "typeorm";
@@ -27,6 +28,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => Room, (room) => room.users)
+  @ManyToMany(() => Room)
   rooms: Room[];
 }
