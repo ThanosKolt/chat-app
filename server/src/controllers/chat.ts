@@ -1,88 +1,100 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
-import { ChatRoomRelation } from "../entity/ChatRoomRelation";
-import status from "http-status";
+import { Room } from "../entity/Room";
+import { StatusCodes } from "http-status-codes";
 import rm from "random-number";
+import { In } from "typeorm";
 
 const manager = AppDataSource.manager;
 
-const chatRepository = AppDataSource.getRepository(ChatRoomRelation);
+const roomRepository = AppDataSource.getRepository(Room);
 
 export const createRoom = async (req: Request, res: Response) => {
   const userAId: number = Number(req.body.userAId);
   const userBId: number = Number(req.body.userBId);
+
   if (!userAId || !userBId) {
     res
-      .status(status.BAD_REQUEST)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ error: { msg: "You need to provide two user ids" } });
     return;
   }
+
   const isSelf = userAId === userBId;
-  const randomRoomId = rm({ min: 1000000000, max: 2147483646, integer: true });
+
   try {
-    const chatRoomExists = await returnChatRoom(userAId,userBId,isSelf);
-    if (chatRoomExists !== null) {
-      res.status(status.BAD_REQUEST).json({
-        error: {
-          msg: "Chat room already exists",
-        },
-      });
-      return;
-    }
-    await manager.insert(ChatRoomRelation, {
-      userAId,
-      userBId,
-      isSelf,
-      roomId: randomRoomId,
+    const roomsA = await roomRepository.find({
+      where: { users: { id: userAId }, isSelf },
     });
-    const chatRoom = await returnChatRoom(userAId,userBId,isSelf);
-    if (chatRoom) {
-      res.status(status.CREATED).json({ roomId: chatRoom.roomId });
-    }
-  } catch (error) {
-    res
-      .status(status.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something wen't wrong" } });
-    console.log(error.message);
-  }
-};
+    const roomsAIds = roomsA.map((room) => room.id);
 
-export const getChatRoomId = async (req: Request, res: Response) => {
-  const userAId = Number(req.body.userAId);
-  const userBId = Number(req.body.userBId);
-  const isSelf = userAId === userBId;
+    const doesRoomExist = await roomRepository.findOneBy({
+      id: In(roomsAIds),
+      users: { id: userBId },
+    });
 
-  if (!userAId || !userBId) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ error: { msg: "You need to provide two user ids" } });
-    return;
-  }
-  try {
-    const chatRoom = await returnChatRoom(userAId,userBId,isSelf);
-    if (!chatRoom) {
-      res.status(status.NOT_FOUND).json({
-        error: {
-          msg: `Didnt find a chat room for users: ${userAId} ${userBId}`,
-        },
+    if (doesRoomExist !== null) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        error: { msg: `This room already exists with id: ${doesRoomExist.id}` },
       });
       return;
     }
-    res.status(status.OK).json({ roomId: chatRoom.roomId });
+
+    const userA = await manager.findOneBy(User, { id: userAId });
+    const userB = await manager.findOneBy(User, { id: userBId });
+
+    const newRoom = new Room();
+    if (userA !== null && userB !== null) {
+      newRoom.isSelf = isSelf;
+      newRoom.users = [userA, userB];
+      await manager.save(newRoom);
+    }
+    res.status(StatusCodes.CREATED).json({ roomId: newRoom.id });
   } catch (error) {
+    console.error(error.message);
     res
-      .status(status.BAD_REQUEST)
-      .json({ error: { msg: "Something wen't wrong, please try again." } });
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "something went wrong." } });
   }
 };
 
-const returnChatRoom = (userAId:number, userBId:number, isSelf:boolean)=>{
-  return chatRepository
+// export const getChatRoomId = async (req: Request, res: Response) => {
+//   const userAId = Number(req.body.userAId);
+//   const userBId = Number(req.body.userBId);
+//   const isSelf = userAId === userBId;
+
+//   if (!userAId || !userBId) {
+//     res
+//       .status(StatusCodes.BAD_REQUEST)
+//       .json({ error: { msg: "You need to provide two user ids" } });
+//     return;
+//   }
+//   try {
+//     const chatRoom = await returnChatRoom(userAId, userBId, isSelf);
+//     if (!chatRoom) {
+//       res.status(StatusCodes.NOT_FOUND).json({
+//         error: {
+//           msg: `Didnt find a chat room for users: ${userAId} ${userBId}`,
+//         },
+//       });
+//       return;
+//     }
+//     res.status(StatusCodes.OK).json({ roomId: chatRoom.roomId });
+//   } catch (error) {
+//     res
+//       .status(StatusCodes.BAD_REQUEST)
+//       .json({ error: { msg: "Something wen't wrong, please try again." } });
+//   }
+// };
+
+const returnChatRoom = (userAId: number, userBId: number, isSelf: boolean) => {
+  return roomRepository
     .createQueryBuilder("chat")
     .select()
     .where("chat.userAId = :userAId OR chat.userAId = :userBId")
     .where("chat.userBId = :userAId OR chat.userBId = :userBId")
-    .where("chat.isSelf = :isSelf").setParameters({userAId, userBId, isSelf})
+    .where("chat.isSelf = :isSelf")
+    .setParameters({ userAId, userBId, isSelf })
     .getOne();
-}
+};
