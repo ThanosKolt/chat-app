@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { createRoom, getRoomId } from "../controllers/chat";
+import { createRoom, getRoomId, getRoomsByUser } from "../controllers/chat";
 const router = Router();
 
-router.route("/get").post(getRoomId);
+router.route("/getRoomId").post(getRoomId);
 router.route("/create").post(createRoom);
+router.route("/getRoomsByUser").post(getRoomsByUser);
 
 export default router;
