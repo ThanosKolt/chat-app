@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
-import status  from "http-status";
+import status from "http-status";
 import { generateToken } from "../utils/jwt";
+import { Like } from "typeorm";
+import { StatusCodes } from "http-status-codes";
 
 interface RequestBody<T> extends Express.Request {
   body: T;
@@ -94,7 +96,9 @@ export const register = async (req: RequestBody<Register>, res: Response) => {
 export const login = async (req: RequestBody<Register>, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    res.status(status.BAD_REQUEST).json({ error: { msg: "Invalid Credentials" } });
+    res
+      .status(status.BAD_REQUEST)
+      .json({ error: { msg: "Invalid Credentials" } });
     return;
   }
   const user = await manager.findOne(User, {
@@ -135,5 +139,19 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(status.OK).json({ msg: "success" });
   } catch (error) {
     res.status(status.INTERNAL_SERVER_ERROR).json({ msg: "delete failed" });
+  }
+};
+
+export const searchUser = async (req: Request, res: Response) => {
+  try {
+    const input: string = req.body.input;
+    let result = await manager.find(User, {
+      where: { username: Like(`%${input}%`) },
+    });
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something went wrong" } });
   }
 };
