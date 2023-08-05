@@ -10,6 +10,7 @@ import {
   JoinTable,
 } from "typeorm";
 import { Room } from "./Room";
+import { Message } from "./Message";
 
 @Entity()
 export class User {
@@ -30,4 +31,7 @@ export class User {
 
   @ManyToMany(() => Room)
   rooms: Room[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
 }

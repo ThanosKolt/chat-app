@@ -4,32 +4,31 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
-  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from "typeorm";
-
+import { Room } from "./Room";
 import { User } from "./User";
-import { Message } from "./Message";
 
 @Entity()
-export class Room {
+export class Message {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @ManyToMany(() => User)
-  @JoinTable()
-  users: User[];
-
-  @OneToMany(() => Message, (message) => message.room)
-  messages: Message[];
-
-  @Column()
-  isSelf: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column()
+  text: string;
+
+  @ManyToOne(() => User, (user) => user.messages)
+  @JoinColumn()
+  sender: User;
+
+  @ManyToOne(() => Room, (room) => room.messages)
+  @JoinColumn()
+  room: Room;
 }

@@ -28,11 +28,13 @@ export class ChatMainComponent {
   ngOnInit() {
     this.chatService.getNewMessage().subscribe((message) => {
       this.messageList.push(message);
-      console.log(message);
     });
 
     if (this.roomId !== undefined) {
       this.chatService.joinRoom(this.roomId);
+      this.chatService.getRoomMessages(this.roomId).subscribe((data) => {
+        data.forEach((message) => this.messageList.push(message));
+      });
     }
     if (
       localStorage.getItem('currentUserId') !== null &&
@@ -53,12 +55,14 @@ export class ChatMainComponent {
         this.toUser.id,
         this.newMessage
       );
-      this.chatService.sendMessage({
-        roomId: this.roomId,
-        fromId: this.currentUserId,
-        toId: this.toUser.id,
-        text: this.newMessage,
-      });
+      this.chatService
+        .sendMessage({
+          roomId: this.roomId,
+          fromId: this.currentUserId,
+          toId: this.toUser.id,
+          text: this.newMessage,
+        })
+        .subscribe();
     }
     this.newMessage = '';
   }

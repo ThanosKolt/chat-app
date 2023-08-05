@@ -18,15 +18,27 @@ export class ChatService {
   // });
 
   // public newMessage = new Subject<string>();
-  baseUrl = 'http://localhost:5000/api/chat/';
+  baseUrl = 'http://localhost:5000/api/';
+
   newMessage = new Subject<Message>();
 
   constructor(private http: HttpClient) {}
 
   socket = io('http://localhost:5000');
 
+  public getRoomMessages(roomId: string) {
+    return this.http.post<Message[]>(this.baseUrl + 'message/getRoomMessages', {
+      roomId,
+    });
+  }
+
   public sendMessage(message: Message) {
     this.socket.emit('message', message);
+    return this.http.post(this.baseUrl + 'message/send', {
+      roomId: message.roomId,
+      senderId: message.fromId,
+      text: message.text,
+    });
   }
 
   public getNewMessage() {
@@ -45,7 +57,7 @@ export class ChatService {
     userAId: number,
     userBId: number
   ): Observable<{ roomId: number }> {
-    return this.http.post<{ roomId: number }>(this.baseUrl + 'create', {
+    return this.http.post<{ roomId: number }>(this.baseUrl + 'chat/create', {
       userAId,
       userBId,
     });
@@ -55,7 +67,7 @@ export class ChatService {
     userAId: number,
     userBId: number
   ): Observable<{ roomId: number }> {
-    return this.http.post<{ roomId: number }>(this.baseUrl + 'getRoomId', {
+    return this.http.post<{ roomId: number }>(this.baseUrl + 'chat/getRoomId', {
       userAId,
       userBId,
     });
@@ -63,7 +75,7 @@ export class ChatService {
 
   public getRoomsByUser(userId: number): Observable<GetRoomsByUserReponse[]> {
     return this.http.post<GetRoomsByUserReponse[]>(
-      this.baseUrl + 'getRoomsByUser',
+      this.baseUrl + 'chat/getRoomsByUser',
       {
         userId,
       }
@@ -71,16 +83,11 @@ export class ChatService {
   }
 
   public getRoomInfo(roomId: string): Observable<GetRoomInfoResponse> {
-    return this.http.post<GetRoomInfoResponse>(this.baseUrl + 'getRoomInfo', {
-      roomId,
-    });
+    return this.http.post<GetRoomInfoResponse>(
+      this.baseUrl + 'chat/getRoomInfo',
+      {
+        roomId,
+      }
+    );
   }
-  // public getNewMessage() {
-  // this.socket.on('message', (message) => {
-  // this.message$.next(message);
-  // });
-
-  // return this.message$.asObservable();
-  // return this.message$;
-  // }
 }

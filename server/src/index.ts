@@ -4,11 +4,12 @@ import express from "express";
 import { config } from "dotenv";
 config();
 import userRouter from "./routes/userRoute";
+import messageRouter from "./routes/messageRoute";
 import chatRouter from "./routes/chatRoute";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { Message } from "./types";
+import { MessageType } from "./types";
 
 const app = express();
 const server = createServer(app);
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/message", messageRouter);
 
 const port = process.env.PORT || 5000;
 
@@ -39,7 +41,7 @@ io.on("connection", (socket) => {
     console.log("user joined " + roomId);
   });
 
-  socket.on("message", ({ fromId, roomId, text, toId }: Message) => {
+  socket.on("message", ({ fromId, roomId, text, toId }: MessageType) => {
     io.to(roomId).emit("message", { text, fromId, toId, roomId });
     console.log(fromId, toId, roomId, text);
   });
