@@ -1,7 +1,6 @@
-<div class="border">
-  <form (submit)="searchUser()">
-  <label>Search Bar</label>
-  <input [(ngModel)]="input" name="input">
+<div class="h-full border-r-4">
+  <form (submit)="searchUser()" class="flex justify-center">
+  <input class="block w-4/5 h-10 p-4 text-gray-900 border border-blue-400 rounded-lg bg-white mt-3" [(ngModel)]="input" name="input" autocomplete="off">
   </form>
   <app-chat-list [users]="users"></app-chat-list>
 </div>

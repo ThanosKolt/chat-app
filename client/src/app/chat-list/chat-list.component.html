@@ -1,10 +1,10 @@
 <div class="">
-  <ul class="">
+  <ul class="flex flex-col gap-2 m-2 items-center">
     <li
       *ngFor="let room of list"
       class=""
     >
-      <button (click)="getChatRoomId(currentUserId, room.user.id)">
+      <button class="text-2xl" (click)="getChatRoomId(currentUserId, room.user.id)">
         {{ room.user.username }}
       </button>
     </li>
