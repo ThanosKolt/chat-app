@@ -1,11 +1,19 @@
-<div class="flex justify-center">
-  <ul class="flex flex-col">
+<div class="">
+  <ul class="">
     <li
       *ngFor="let room of list"
-      class="justify-center text-center py-2 text-xl"
+      class=""
     >
       <button (click)="getChatRoomId(currentUserId, room.user.id)">
         {{ room.user.username }}
+      </button>
+    </li>
+    <li
+      *ngFor="let user of users"
+      class=""
+    >
+      <button (click)="getChatRoomId(currentUserId, user.id)">
+        {{ user.username }}
       </button>
     </li>
   </ul>

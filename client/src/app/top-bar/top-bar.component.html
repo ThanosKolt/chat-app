@@ -1,3 +1,4 @@
-<div class="h-15 text-center py-4 border text-2xl">
-  <h1><a [href]="['/']">Welcome, {{username}}</a></h1>
+<div class="h-full w-full flex-col text-2xl flex items-center">
+  <h1 class="w-fit"><a [href]="['/']">Welcome, {{username}}</a></h1>
+  <button (click)="onLogout()" class="bg-blue-500 text-white m-2 p-2 rounded-lg">Logout</button>
 </div>

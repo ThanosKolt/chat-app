@@ -10,6 +10,7 @@ import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatMainComponent } from './chat-main/chat-main.component';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { SideBarComponent } from './side-bar/side-bar.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
     ChatListComponent,
     LoginComponent,
     ChatMainComponent,
+    SideBarComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,3 +1,13 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+.app-container {
+  display:grid;
+  grid-template-columns: 2fr 6fr; 
+  grid-template-rows: 3fr 30fr;
+}
+
+.topbar {
+  grid-column: span 2;
+}

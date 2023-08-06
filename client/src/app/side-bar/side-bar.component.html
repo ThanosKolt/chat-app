@@ -1,0 +1,7 @@
+<div class="border">
+  <form (submit)="searchUser()">
+  <label>Search Bar</label>
+  <input [(ngModel)]="input" name="input">
+  </form>
+  <app-chat-list [users]="users"></app-chat-list>
+</div>

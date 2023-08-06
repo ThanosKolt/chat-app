@@ -26,4 +26,9 @@ export class UserService {
   getUser(id: string): Observable<User> {
     return this.http.get<User>(`http://localhost:5000/api/user/${id}`);
   }
+  searchUsers(input: string): Observable<User[]> {
+    return this.http.post<User[]>(`http://localhost:5000/api/user/search`, {
+      input,
+    });
+  }
 }

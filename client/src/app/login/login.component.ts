@@ -20,6 +20,15 @@ export class LoginComponent {
     private router: Router
   ) {}
 
+  ngOnInit() {
+    if (
+      localStorage.getItem('currentUserId') &&
+      localStorage.getItem('currentUserUsername')
+    ) {
+      this.router.navigate(['/']);
+    }
+  }
+
   onSubmit(): void {
     this.userService.login(this.loginForm.value).subscribe({
       next: ({ user }) => {

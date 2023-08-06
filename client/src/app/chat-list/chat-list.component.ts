@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { UserService } from '../user.service';
 import { GetRoomsByUserReponse, User } from 'src/types';
 import { ChatService } from '../chat.service';
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class ChatListComponent {
   currentUserId: number = -1;
-  users: User[] = [];
+  @Input() users: User[] = [];
   list: GetRoomsByUserReponse[] = [];
 
   constructor(
@@ -22,10 +22,12 @@ export class ChatListComponent {
   ) {}
 
   ngOnInit() {
-    this.getUsers();
+    // this.getUsers();
     if (localStorage.getItem('currentUserId') !== null) {
       this.currentUserId = Number(localStorage.getItem('currentUserId'))!;
-      this.getList();
+      if (!this.users) {
+        this.getList();
+      }
     }
   }
 
@@ -37,16 +39,16 @@ export class ChatListComponent {
     });
   }
 
-  getUsers() {
-    this.userService.getUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-      },
-      error: (error) => {
-        console.log(error.message);
-      },
-    });
-  }
+  // getUsers() {
+  //   this.userService.getUsers().subscribe({
+  //     next: (data) => {
+  //       this.users = data;
+  //     },
+  //     error: (error) => {
+  //       console.log(error.message);
+  //     },
+  //   });
+  // }
 
   getChatRoomId(userAId: number, userBId: number) {
     this.chatService.getRoomId(userAId, userBId).subscribe({
