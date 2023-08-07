@@ -9,16 +9,6 @@ import { LoginRequest, LoginResponse, User } from 'src/types';
 export class UserService {
   constructor(private http: HttpClient) {}
 
-  login(request: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
-      'http://localhost:5000/api/user/login',
-      {
-        username: request.username,
-        password: request.password,
-      }
-    );
-  }
-
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>('http://localhost:5000/api/user');
   }

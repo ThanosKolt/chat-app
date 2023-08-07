@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -9,15 +10,16 @@ import { Router } from '@angular/router';
 export class TopBarComponent {
   username: string | null = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit() {
-    this.username = localStorage.getItem('currentUserUsername');
+    this.authService.currentUser.subscribe((currentUser) => {
+      this.username = currentUser.username;
+    });
   }
 
   onLogout() {
-    localStorage.removeItem('currentUserUsername');
-    localStorage.removeItem('currentUserId');
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 }
