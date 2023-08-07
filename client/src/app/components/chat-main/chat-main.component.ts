@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
-import { ChatService } from '../chat.service';
-import { UserService } from '../user.service';
+import { ChatService } from '../../shared/chatService/chat.service';
+import { UserService } from '../../shared/userService/user.service';
 import { Message } from 'src/types';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat-main',
@@ -19,23 +20,34 @@ export class ChatMainComponent {
   currentUserUsername: string = '';
   newMessage: string = '';
   messageList: Message[] = [];
+  subscriptions: Subscription[] = [];
+  constructor(private chatService: ChatService) {}
 
-  constructor(
-    private chatService: ChatService,
-    private userService: UserService
-  ) {}
+  ngOnDestroy() {
+    console.log('destroy');
+    this.subscriptions.forEach((sub) => {
+      sub.unsubscribe();
+    });
+  }
 
   ngOnInit() {
-    this.chatService.getNewMessage().subscribe((message) => {
-      this.messageList.push(message);
-    });
+    const newMessageSub = this.chatService
+      .getNewMessage()
+      .subscribe((message) => {
+        this.messageList.push(message);
+      });
 
     if (this.roomId !== undefined) {
       this.chatService.joinRoom(this.roomId);
-      this.chatService.getRoomMessages(this.roomId).subscribe((data) => {
-        data.forEach((message) => this.messageList.push(message));
-      });
+      const getRoomMessageSub = this.chatService
+        .getRoomMessages(this.roomId)
+        .subscribe((data) => {
+          data.forEach((message) => this.messageList.push(message));
+        });
+
+      this.subscriptions.push(newMessageSub, getRoomMessageSub);
     }
+
     if (
       localStorage.getItem('currentUserId') !== null &&
       localStorage.getItem('currentUserUsername') !== null
@@ -49,12 +61,6 @@ export class ChatMainComponent {
 
   sendMessage() {
     if (this.newMessage.trim().length > 0 && this.roomId !== undefined) {
-      console.log(
-        this.roomId,
-        this.currentUserId,
-        this.toUser.id,
-        this.newMessage
-      );
       this.chatService
         .sendMessage({
           roomId: this.roomId,
@@ -62,7 +68,7 @@ export class ChatMainComponent {
           toId: this.toUser.id,
           text: this.newMessage,
         })
-        .subscribe();
+        .subscribe(() => console.log('subbed to sendmessage'));
     }
     this.newMessage = '';
   }

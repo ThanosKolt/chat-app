@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GetRoomInfoResponse, GetRoomsByUserReponse } from 'src/types';
-import { Message } from '../types';
+import { Message } from '../../../types';
 
 @Injectable({
   providedIn: 'root',

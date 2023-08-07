@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { User } from 'src/types';
-import { UserService } from '../user.service';
+import { UserService } from '../../shared/userService/user.service';
 
 @Component({
   selector: 'app-side-bar',

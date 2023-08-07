@@ -5,10 +5,10 @@ import {
   provideRouter,
   withComponentInputBinding,
 } from '@angular/router';
-import { LoginComponent } from './login/login.component';
-import { ChatListComponent } from './chat-list/chat-list.component';
-import { ChatMainComponent } from './chat-main/chat-main.component';
-import { authguardGuard } from './authguard.guard';
+import { LoginComponent } from './components/login/login.component';
+import { ChatListComponent } from './components/chat-list/chat-list.component';
+import { ChatMainComponent } from './components/chat-main/chat-main.component';
+import { authguardGuard } from './shared/authGuard/authguard.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },

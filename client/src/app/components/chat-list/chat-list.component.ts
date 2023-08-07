@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
-import { UserService } from '../user.service';
+import { UserService } from '../../shared/userService/user.service';
 import { GetRoomsByUserReponse, User } from 'src/types';
-import { ChatService } from '../chat.service';
+import { ChatService } from '../../shared/chatService/chat.service';
 import { Router } from '@angular/router';
 
 @Component({

@@ -4,13 +4,13 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TopBarComponent } from './top-bar/top-bar.component';
-import { ChatListComponent } from './chat-list/chat-list.component';
-import { LoginComponent } from './login/login.component';
+import { TopBarComponent } from './components/top-bar/top-bar.component';
+import { ChatListComponent } from './components/chat-list/chat-list.component';
+import { LoginComponent } from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ChatMainComponent } from './chat-main/chat-main.component';
+import { ChatMainComponent } from './components/chat-main/chat-main.component';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { SideBarComponent } from './side-bar/side-bar.component';
+import { SideBarComponent } from './components/side-bar/side-bar.component';
 
 @NgModule({
   declarations: [
