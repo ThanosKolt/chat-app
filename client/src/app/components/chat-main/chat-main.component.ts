@@ -28,6 +28,7 @@ export class ChatMainComponent {
     this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
     });
+    this.chatService.removeListener();
   }
 
   ngOnInit() {
@@ -61,7 +62,7 @@ export class ChatMainComponent {
 
   sendMessage() {
     if (this.newMessage.trim().length > 0 && this.roomId !== undefined) {
-      this.chatService
+      const sendMessageSub = this.chatService
         .sendMessage({
           roomId: this.roomId,
           fromId: this.currentUserId,
@@ -69,22 +70,26 @@ export class ChatMainComponent {
           text: this.newMessage,
         })
         .subscribe(() => console.log('subbed to sendmessage'));
+      this.subscriptions.push(sendMessageSub);
     }
     this.newMessage = '';
   }
 
   getToUserId() {
     if (this.roomId !== undefined) {
-      this.chatService.getRoomInfo(this.roomId).subscribe({
-        next: (data) => {
-          data.users.forEach((user) => {
-            if (user.id !== this.currentUserId) {
-              this.toUser.id = user.id;
-              this.toUser.username = user.username;
-            }
-          });
-        },
-      });
+      const getRoomInfoSub = this.chatService
+        .getRoomInfo(this.roomId)
+        .subscribe({
+          next: (data) => {
+            data.users.forEach((user) => {
+              if (user.id !== this.currentUserId) {
+                this.toUser.id = user.id;
+                this.toUser.username = user.username;
+              }
+            });
+          },
+        });
+      this.subscriptions.push(getRoomInfoSub);
     }
   }
 }

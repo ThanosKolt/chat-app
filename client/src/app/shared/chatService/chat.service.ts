@@ -9,28 +9,13 @@ import { Message } from '../../../types';
   providedIn: 'root',
 })
 export class ChatService {
-  // public message$ = new BehaviorSubject('');
-
-  // public message$ = new Observable<string>((subscriber) => {
-  //   this.socket.on('message', (message) => {
-  //     subscriber.next(message);
-  //   });
-  // });
-
-  // public newMessage = new Subject<string>();
   baseUrl = 'http://localhost:5000/api/';
 
   newMessage = new Subject<Message>();
 
-  constructor(private http: HttpClient) {}
-
   socket = io('http://localhost:5000');
 
-  public getRoomMessages(roomId: string) {
-    return this.http.post<Message[]>(this.baseUrl + 'message/getRoomMessages', {
-      roomId,
-    });
-  }
+  constructor(private http: HttpClient) {}
 
   public sendMessage(message: Message) {
     this.socket.emit('message', message);
@@ -39,6 +24,10 @@ export class ChatService {
       senderId: message.fromId,
       text: message.text,
     });
+  }
+
+  public removeListener() {
+    this.socket.off('message');
   }
 
   public getNewMessage() {
@@ -51,6 +40,12 @@ export class ChatService {
 
   public joinRoom(roomId: string) {
     this.socket.emit('joinRoom', roomId);
+  }
+
+  public getRoomMessages(roomId: string) {
+    return this.http.post<Message[]>(this.baseUrl + 'message/getRoomMessages', {
+      roomId,
+    });
   }
 
   public createChatRoom(
