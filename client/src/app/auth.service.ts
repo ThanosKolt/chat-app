@@ -7,7 +7,7 @@ import { LoginRequest, LoginResponse, User } from 'src/types';
   providedIn: 'root',
 })
 export class AuthService {
-  isLoggedIn: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  isLoggedIn = new BehaviorSubject(false);
   currentUser: BehaviorSubject<User> = new BehaviorSubject({
     id: -1,
     username: '',
@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('curentUserUsername');
+    localStorage.removeItem('currentUserUsername');
     localStorage.removeItem('currentUserId');
     localStorage.removeItem('token');
     this.currentUser.next({ id: -1, username: '' });
