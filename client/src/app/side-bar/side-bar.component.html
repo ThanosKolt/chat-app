@@ -8,5 +8,7 @@
     />
   </form>
   <app-chat-list [users]="users"></app-chat-list>
-  <h1 *ngIf="users.length === 0">You can search for users here.</h1>
+  <h1 *ngIf="users.length === 0" class="text-center">
+    You can search for users here.
+  </h1>
 </div>
