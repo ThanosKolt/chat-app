@@ -1,7 +1,14 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { ChatService } from '../../shared/chatService/chat.service';
 import { Message } from 'src/types';
 import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-chat-main',
@@ -9,7 +16,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./chat-main.component.css'],
 })
 export class ChatMainComponent {
-  @Input('id')
+  // @Input('id')
   roomId?: string;
 
   @ViewChild('form')
@@ -27,17 +34,14 @@ export class ChatMainComponent {
   newMessage: string = '';
   messageList: Message[] = [];
   subscriptions: Subscription[] = [];
-  constructor(private chatService: ChatService) {}
+
+  constructor(
+    private chatService: ChatService,
+    private route: ActivatedRoute
+  ) {}
 
   ngAfterViewChecked() {
     this.updateScroll();
-  }
-
-  updateScroll() {
-    if (this.chatDiv !== undefined) {
-      this.chatDiv.nativeElement.scrollTop =
-        this.chatDiv.nativeElement.scrollHeight;
-    }
   }
 
   ngOnDestroy() {
@@ -48,22 +52,26 @@ export class ChatMainComponent {
   }
 
   ngOnInit() {
+    this.route.paramMap.subscribe((paramMap) => {
+      if (paramMap.get('id') !== null) {
+        this.roomId = paramMap.get('id')!;
+        this.chatService.joinRoom(this.roomId);
+        const getRoomMessageSub = this.chatService
+          .getRoomMessages(this.roomId)
+          .subscribe((data) => {
+            this.messageList = [];
+            data.forEach((message) => this.messageList.push(message));
+          });
+        this.subscriptions.push(getRoomMessageSub);
+      }
+    });
     const newMessageSub = this.chatService
       .getNewMessage()
       .subscribe((message) => {
         this.messageList.push(message);
       });
 
-    if (this.roomId !== undefined) {
-      this.chatService.joinRoom(this.roomId);
-      const getRoomMessageSub = this.chatService
-        .getRoomMessages(this.roomId)
-        .subscribe((data) => {
-          data.forEach((message) => this.messageList.push(message));
-        });
-
-      this.subscriptions.push(newMessageSub, getRoomMessageSub);
-    }
+    this.subscriptions.push(newMessageSub);
 
     if (
       localStorage.getItem('currentUserId') !== null &&
@@ -74,6 +82,13 @@ export class ChatMainComponent {
     }
 
     this.getToUserId();
+  }
+
+  updateScroll() {
+    if (this.chatDiv !== undefined) {
+      this.chatDiv.nativeElement.scrollTop =
+        this.chatDiv.nativeElement.scrollHeight;
+    }
   }
 
   sendMessage() {
