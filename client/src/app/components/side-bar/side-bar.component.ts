@@ -14,12 +14,12 @@ export class SideBarComponent {
   constructor(private userService: UserService) {}
 
   searchUser() {
-    this.users = [];
     this.userService.searchUsers(this.input).subscribe((users) => {
-      users.forEach((user) => {
-        this.users.push(user);
-      });
+      if (this.input === '') {
+        this.users = [];
+        return;
+      }
+      this.users = users;
     });
-    this.input = '';
   }
 }

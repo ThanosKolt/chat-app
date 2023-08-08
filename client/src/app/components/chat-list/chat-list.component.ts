@@ -1,6 +1,4 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
-import { UserService } from '../../shared/userService/user.service';
 import { GetRoomsByUserReponse, User } from 'src/types';
 import { ChatService } from '../../shared/chatService/chat.service';
 import { Router } from '@angular/router';
@@ -15,14 +13,9 @@ export class ChatListComponent {
   @Input() users: User[] = [];
   list: GetRoomsByUserReponse[] = [];
 
-  constructor(
-    private userService: UserService,
-    private chatService: ChatService,
-    private router: Router
-  ) {}
+  constructor(private chatService: ChatService, private router: Router) {}
 
   ngOnInit() {
-    // this.getUsers();
     if (localStorage.getItem('currentUserId') !== null) {
       this.currentUserId = Number(localStorage.getItem('currentUserId'))!;
       if (!this.users) {
@@ -38,17 +31,6 @@ export class ChatListComponent {
       },
     });
   }
-
-  // getUsers() {
-  //   this.userService.getUsers().subscribe({
-  //     next: (data) => {
-  //       this.users = data;
-  //     },
-  //     error: (error) => {
-  //       console.log(error.message);
-  //     },
-  //   });
-  // }
 
   getChatRoomId(userAId: number, userBId: number) {
     this.chatService.getRoomId(userAId, userBId).subscribe({

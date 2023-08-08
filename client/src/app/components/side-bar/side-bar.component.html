@@ -1,14 +1,12 @@
 <div class="h-full border-r-2">
-  <form (submit)="searchUser()" class="flex justify-center">
+  <form (keyup)="searchUser()" class="flex justify-center">
     <input
       class="block w-4/5 h-10 p-4 text-gray-900 border border-blue-400 rounded-lg bg-white mt-3"
       [(ngModel)]="input"
       name="input"
       autocomplete="off"
+      placeholder="Search for users..."
     />
   </form>
   <app-chat-list [users]="users"></app-chat-list>
-  <h1 *ngIf="users.length === 0" class="text-center">
-    You can search for users here.
-  </h1>
 </div>
