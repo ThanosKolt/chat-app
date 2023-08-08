@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  HostListener,
   Input,
   SimpleChanges,
   ViewChild,
@@ -40,8 +41,23 @@ export class ChatMainComponent {
     private route: ActivatedRoute
   ) {}
 
+  @HostListener('window:resize', ['$event'])
+  updateChatSize() {
+    if (
+      this.chatDiv?.nativeElement.offsetHeight !== null &&
+      this.formElement?.nativeElement.offsetHeight !== null
+    ) {
+      this.chatDiv!.nativeElement.style.height =
+        (
+          this.chatDiv!.nativeElement.parentElement!.offsetHeight -
+          this.formElement!.nativeElement.offsetHeight
+        ).toString() + 'px';
+    }
+  }
+
   ngAfterViewChecked() {
     this.updateScroll();
+    this.updateChatSize();
   }
 
   ngOnDestroy() {

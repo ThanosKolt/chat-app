@@ -1,5 +1,5 @@
 <div class="h-full relative">
-  <div #chatDiv class="overflow-y-scroll w-full absolute h-5/6">
+  <div #chatDiv class="overflow-y-scroll w-full absolute">
     <ul class="flex flex-col">
       <li
         *ngFor="let message of messageList"
@@ -17,9 +17,10 @@
     </ul>
   </div>
   <div
+    #form
     class="border-t-2 h-12 flex items-center justify-center w-full absolute bottom-0"
   >
-    <form #form class="flex justify-center w-5/6">
+    <form class="flex justify-center w-5/6">
       <input
         [(ngModel)]="newMessage"
         name="input"
