@@ -26,7 +26,7 @@ export class ChatService {
     });
   }
 
-  public removeListener() {
+  public removeListeners() {
     this.socket.off('message');
   }
 

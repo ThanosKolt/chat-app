@@ -1,6 +1,5 @@
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ChatService } from '../../shared/chatService/chat.service';
-import { UserService } from '../../shared/userService/user.service';
 import { Message } from 'src/types';
 import { Subscription } from 'rxjs';
 
@@ -10,7 +9,14 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./chat-main.component.css'],
 })
 export class ChatMainComponent {
-  @Input('id') roomId?: string;
+  @Input('id')
+  roomId?: string;
+
+  @ViewChild('form')
+  formElement?: ElementRef<HTMLFormElement>;
+
+  @ViewChild('chatDiv')
+  chatDiv?: ElementRef<HTMLDivElement>;
 
   toUser: {
     id: number;
@@ -23,12 +29,22 @@ export class ChatMainComponent {
   subscriptions: Subscription[] = [];
   constructor(private chatService: ChatService) {}
 
+  ngAfterViewChecked() {
+    this.updateScroll();
+  }
+
+  updateScroll() {
+    if (this.chatDiv !== undefined) {
+      this.chatDiv.nativeElement.scrollTop =
+        this.chatDiv.nativeElement.scrollHeight;
+    }
+  }
+
   ngOnDestroy() {
-    console.log('destroy');
     this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
     });
-    this.chatService.removeListener();
+    this.chatService.removeListeners();
   }
 
   ngOnInit() {
@@ -61,6 +77,7 @@ export class ChatMainComponent {
   }
 
   sendMessage() {
+    this.updateScroll();
     if (this.newMessage.trim().length > 0 && this.roomId !== undefined) {
       const sendMessageSub = this.chatService
         .sendMessage({
