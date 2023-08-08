@@ -1,17 +1,15 @@
-<div class="">
+<div class="flex flex-col items-center">
+  <h1 *ngIf="list.length > 0" class="text-2xl underline">History</h1>
   <ul class="flex flex-col gap-2 m-2 items-center">
-    <li
-      *ngFor="let room of list"
-      class=""
-    >
-      <button class="text-2xl" (click)="getChatRoomId(currentUserId, room.user.id)">
+    <li *ngFor="let room of list" class="">
+      <button
+        class="text-2xl"
+        (click)="getChatRoomId(currentUserId, room.user.id)"
+      >
         {{ room.user.username }}
       </button>
     </li>
-    <li
-      *ngFor="let user of users"
-      class=""
-    >
+    <li *ngFor="let user of users" class="">
       <button (click)="getChatRoomId(currentUserId, user.id)">
         {{ user.username }}
       </button>
