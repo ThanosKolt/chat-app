@@ -10,9 +10,8 @@
             : 'self-start bg-gray-100 text-black'
         "
       >
-        {{
-          message.fromId === toUser.id ? toUser.username : currentUserUsername
-        }}: {{ message.text }}
+        {{ message.fromId === toUser.id ? toUser.username : "you" }}:
+        {{ message.text }}
       </li>
     </ul>
   </div>
