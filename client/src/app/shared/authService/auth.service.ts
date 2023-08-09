@@ -26,26 +26,61 @@ export class AuthService {
           next: ({ token, user }) => {
             this.isLoggedIn.next(true);
             this.currentUser.next({ id: user.id, username: user.username });
-            localStorage.setItem('currentUserUsername', user.username);
-            localStorage.setItem('currentUserId', user.id.toString());
+            this.saveCredentialsInLocalStorage(
+              user.id.toString(),
+              user.username
+            );
             localStorage.setItem('token', token);
           },
           error: () => {
             this.isLoggedIn.next(false);
             this.currentUser.next({ id: -1, username: '' });
-            localStorage.removeItem('currentUserUsername');
-            localStorage.removeItem('currentUserId');
-            localStorage.removeItem('token');
+            this.clearCredentialsFromLocalStorage();
+          },
+        })
+      );
+  }
+
+  register(request: LoginRequest): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>('http://localhost:5000/api/user/register', {
+        username: request.username,
+        password: request.password,
+      })
+      .pipe(
+        tap({
+          next: ({ user }) => {
+            this.isLoggedIn.next(true);
+            this.currentUser.next({ id: user.id, username: user.username });
+            this.saveCredentialsInLocalStorage(
+              user.id.toString(),
+              user.username
+            );
+            // localStorage.setItem('token', token);
+          },
+          error: () => {
+            this.isLoggedIn.next(false);
+            this.currentUser.next({ id: -1, username: '' });
+            this.clearCredentialsFromLocalStorage();
           },
         })
       );
   }
 
   logout() {
+    this.clearCredentialsFromLocalStorage();
+    this.currentUser.next({ id: -1, username: '' });
+    this.isLoggedIn.next(false);
+  }
+
+  private saveCredentialsInLocalStorage(id: string, username: string) {
+    localStorage.setItem('currentUserUsername', username);
+    localStorage.setItem('currentUserId', id);
+  }
+
+  private clearCredentialsFromLocalStorage() {
     localStorage.removeItem('currentUserUsername');
     localStorage.removeItem('currentUserId');
     localStorage.removeItem('token');
-    this.currentUser.next({ id: -1, username: '' });
-    this.isLoggedIn.next(false);
   }
 }

@@ -14,6 +14,8 @@ export class LoginComponent {
     password: '',
   });
 
+  showPassword: boolean = false;
+
   constructor(
     private authService: AuthService,
     private formBuilder: FormBuilder,

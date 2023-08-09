@@ -70,27 +70,33 @@ export const getUserByUsername = async (req: Request, res: Response) => {
 
 export const register = async (req: RequestBody<Register>, res: Response) => {
   const { username, password } = req.body;
-  const userExists = await manager.findOne(User, { where: { username } });
-  if (userExists) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ error: { msg: `user ${username} already exists` } });
-    return;
-  }
-  if (password.trim().length < 5) {
-    res.status(status.BAD_REQUEST).json({
-      error: { msg: "password needs to be longer than 5 characters" },
+  try {
+    const userExists = await manager.findOne(User, { where: { username } });
+    if (userExists) {
+      res
+        .status(status.BAD_REQUEST)
+        .json({ error: { msg: `user ${username} already exists` } });
+      return;
+    }
+    if (password.trim().length < 5) {
+      res.status(status.BAD_REQUEST).json({
+        error: { msg: "password needs to be longer than 5 characters" },
+      });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await manager.insert(User, { username, password: hashedPassword });
+    const user = await manager.findOne(User, {
+      where: { username },
     });
-    return;
+    res.status(status.CREATED).json({ user });
+  } catch (error) {
+    res
+      .status(status.INTERNAL_SERVER_ERROR)
+      .json({ error: { msg: "Something went wrong" } });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  await manager.insert(User, { username, password: hashedPassword });
-  const user = await manager.findOne(User, {
-    where: { username },
-  });
-  res.status(status.CREATED).json({ user });
 };
 
 export const login = async (req: RequestBody<Register>, res: Response) => {

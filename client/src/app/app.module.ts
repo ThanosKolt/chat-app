@@ -11,6 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChatMainComponent } from './components/chat-main/chat-main.component';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { SideBarComponent } from './components/side-bar/side-bar.component';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { SideBarComponent } from './components/side-bar/side-bar.component';
     LoginComponent,
     ChatMainComponent,
     SideBarComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,
