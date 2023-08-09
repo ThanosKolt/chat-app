@@ -1,9 +1,17 @@
 .app-container {
   display: grid;
-  grid-template-columns: 2fr 6fr;
+  grid-template-columns: 1.5fr 6fr;
   grid-template-rows: 3.5em auto;
 }
 
 .topbar {
   grid-column: span 2;
+}
+
+.toggle-sidebar {
+  grid-template-columns: 0.3fr 6fr;
+}
+
+.hide-sidebar-content {
+  display: none;
 }

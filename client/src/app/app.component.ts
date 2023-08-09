@@ -8,6 +8,8 @@ import { Route, Router } from '@angular/router';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
+  showSidebar: boolean = false;
+
   title = 'chat-app';
 
   isLoggedIn: boolean = false;
@@ -18,5 +20,9 @@ export class AppComponent {
     this.authService.isLoggedIn.subscribe((value) => {
       this.isLoggedIn = value;
     });
+  }
+
+  toggleSidebar(value: boolean) {
+    this.showSidebar = value;
   }
 }

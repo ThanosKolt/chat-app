@@ -1,6 +1,13 @@
-<div class="h-screen app-container">
+<div
+  class="h-screen app-container"
+  [ngClass]="showSidebar ? '' : 'toggle-sidebar'"
+>
   <app-top-bar *ngIf="isLoggedIn" class="topbar border"></app-top-bar>
-  <app-side-bar *ngIf="isLoggedIn" class="sidebar"></app-side-bar>
+  <app-side-bar
+    *ngIf="isLoggedIn"
+    class="sidebar border-r-2"
+    (showSidebarEvent)="toggleSidebar($event)"
+  ></app-side-bar>
   <div class="main">
     <router-outlet></router-outlet>
   </div>
