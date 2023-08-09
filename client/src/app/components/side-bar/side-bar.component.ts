@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { User } from 'src/types';
 import { UserService } from '../../shared/userService/user.service';
+import { AuthService } from 'src/app/shared/authService/auth.service';
 
 @Component({
   selector: 'app-side-bar',
@@ -11,7 +12,10 @@ export class SideBarComponent {
   users: User[] = [];
   input: string = '';
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   searchUser() {
     this.userService.searchUsers(this.input).subscribe((users) => {
@@ -19,7 +23,9 @@ export class SideBarComponent {
         this.users = [];
         return;
       }
-      this.users = users;
+      this.users = users.filter(
+        (user) => user.id !== Number(localStorage.getItem('currentUserId'))
+      );
     });
   }
 }

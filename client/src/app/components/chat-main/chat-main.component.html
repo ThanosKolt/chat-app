@@ -6,7 +6,7 @@
         class="rounded-lg w-fit px-2 py-1 m-4 text-lg"
         [ngClass]="
           message.fromId === currentUserId
-            ? 'self-end bg-blue-400 text-gray-100'
+            ? 'self-end bg-blue-500 text-gray-100'
             : 'self-start bg-gray-100 text-black'
         "
       >
@@ -25,10 +25,10 @@
         [(ngModel)]="newMessage"
         name="input"
         type="text"
-        class="bg-gray-50 border border-gray-300 text-gray-60000 rounded-lg w-4/5 px-2 mx-2"
+        class="bg-gray-50 border border-gray-300 text-gray-60000 rounded-lg w-4/5 px-2 mx-2 focus:outline-none focus:border-1 focus:border-blue-500"
       />
       <button
-        class="w-fit px-2 rounded-md bg-blue-500 text-gray-50"
+        class="w-fit px-2 rounded-md bg-blue-500 text-gray-50 hover:bg-blue-700"
         type="submit"
         (click)="sendMessage()"
       >
