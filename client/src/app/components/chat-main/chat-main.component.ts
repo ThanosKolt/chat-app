@@ -63,7 +63,6 @@ export class ChatMainComponent {
     this.subscriptions.forEach((sub) => {
       sub.unsubscribe();
     });
-    this.chatService.removeListeners();
   }
 
   ngOnInit() {
@@ -141,14 +140,19 @@ export class ChatMainComponent {
   }
 
   getNewMessage() {
-    const newMessageSub = this.chatService
-      .getNewMessage()
-      .subscribe((message) => {
-        this.messageList.push(message);
-        if (message.fromId !== this.currentUser.id) {
-          this.audioService.playMessageNotification();
-        }
-      });
+    const newMessageSub = this.chatService.newMessage.subscribe((message) => {
+      this.messageList.push(message);
+      if (message.fromId !== this.currentUser.id) {
+        this.audioService.playMessageNotification();
+      }
+    });
+    // .getNewMessage()
+    // .subscribe((message) => {
+    //   this.messageList.push(message);
+    //   if (message.fromId !== this.currentUser.id) {
+    //     this.audioService.playMessageNotification();
+    //   }
+    // });
 
     this.subscriptions.push(newMessageSub);
   }

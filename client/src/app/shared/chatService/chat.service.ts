@@ -11,6 +11,12 @@ import { Message } from '../../../types';
 export class ChatService {
   baseUrl = 'http://localhost:5000/api/';
 
+  // newMessage = new BehaviorSubject<Message>({
+  //   fromId: -1,
+  //   roomId: '',
+  //   text: '',
+  //   toId: -1,
+  // });
   newMessage = new Subject<Message>();
 
   socket = io('http://localhost:5000');
