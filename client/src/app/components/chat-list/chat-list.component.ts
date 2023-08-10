@@ -33,9 +33,11 @@ export class ChatListComponent {
 
   ngOnChanges() {
     this.list = [];
-    this.users.forEach((user) => {
-      this.list.push({ user });
-    });
+    if (this.users) {
+      this.users.forEach((user) => {
+        this.list.push({ user });
+      });
+    }
   }
 
   ngOnInit() {

@@ -16,10 +16,11 @@ export class SideBarComponent {
 
   users: User[] = [];
   input: string = '';
-  constructor(
-    private userService: UserService,
-    private authService: AuthService
-  ) {}
+  constructor(private userService: UserService) {}
+
+  ngOnInit() {
+    this.showSidebarEvent.emit(this.showSidebar);
+  }
 
   searchUser() {
     this.userService.searchUsers(this.input).subscribe((users) => {
