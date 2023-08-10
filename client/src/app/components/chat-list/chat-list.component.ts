@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { GetRoomsByUserReponse, User } from 'src/types';
+import { GetRoomsByUserReponse, Message, User } from 'src/types';
 import { ChatService } from '../../shared/chatService/chat.service';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/authService/auth.service';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 
 @Component({
   selector: 'app-chat-list',
@@ -11,14 +11,14 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./chat-list.component.css'],
 })
 export class ChatListComponent {
-  currentUserId: number = -1;
-  currentUserUsername: string = '';
-  currentUserSub: Subscription = new Subscription();
   @Input() users: User[] = [];
+
+  currentUser: User = { id: -1, username: '' };
+  currentUserSub: Subscription = new Subscription();
   list: {
-    roomId: number;
-    user: { id: number; username: string };
-    lastMessage: string;
+    user: User;
+    roomId?: number;
+    lastMessage?: string;
   }[] = [];
 
   constructor(
@@ -31,45 +31,57 @@ export class ChatListComponent {
     this.currentUserSub.unsubscribe();
   }
 
-  ngOnInit() {
-    if (localStorage.getItem('currentUserId') !== null) {
-      this.currentUserId = Number(localStorage.getItem('currentUserId'))!;
-      this.currentUserSub = this.authService.currentUser.subscribe((user) => {
-        this.currentUserId = user.id;
-        this.currentUserUsername = user.username;
-      });
-      if (!this.users) {
-        this.getList();
-      }
-    }
-  }
-
-  getList() {
-    this.chatService.getRoomsByUser(this.currentUserId).subscribe({
-      next: (data) => {
-        data.forEach((room) => {
-          this.chatService
-            .getRoomMessages(room.roomId.toString())
-            .subscribe((messages) => {
-              let formatLastMessage = '';
-              let lastMessage = messages[messages.length - 1];
-              if (lastMessage.fromId === this.currentUserId) {
-                formatLastMessage = `You wrote: ${lastMessage.text}`;
-              } else {
-                formatLastMessage = `${room.user.username} wrote: ${lastMessage.text}`;
-              }
-              this.list.push({
-                roomId: room.roomId,
-                user: { id: room.user.id, username: room.user.username },
-                lastMessage: formatLastMessage,
-              });
-            });
-        });
-      },
+  ngOnChanges() {
+    this.list = [];
+    this.users.forEach((user) => {
+      this.list.push({ user });
     });
   }
 
-  getChatRoomId(userAId: number, userBId: number) {
+  ngOnInit() {
+    this.currentUserSub = this.authService.currentUser.subscribe((user) => {
+      this.currentUser.id = user.id;
+      this.currentUser.username = user.username;
+    });
+    if (!this.users) {
+      this.getActiveRooms();
+    } else {
+      this.users.forEach((user) => {
+        this.list.push({ user });
+      });
+    }
+  }
+
+  getActiveRooms() {
+    this.chatService.getRoomsByUser(this.currentUser.id).subscribe((rooms) => {
+      rooms.forEach((room) => {
+        this.list.push({
+          user: { id: room.user.id, username: room.user.username },
+          roomId: room.roomId,
+        });
+      });
+      this.populateListWithLastMessage();
+    });
+  }
+
+  populateListWithLastMessage() {
+    this.list.forEach((room) => {
+      this.chatService
+        .getRoomMessages(room.roomId!.toString())
+        .subscribe((messages) => {
+          let formatLastMessage = '';
+          let lastMessage = messages[messages.length - 1];
+          if (lastMessage.fromId === this.currentUser.id) {
+            formatLastMessage = `You wrote: ${lastMessage.text}`;
+          } else {
+            formatLastMessage = `${room.user.username} wrote: ${lastMessage.text}`;
+          }
+          room.lastMessage = formatLastMessage;
+        });
+    });
+  }
+
+  getChatRoom(userAId: number, userBId: number) {
     this.chatService.getRoomId(userAId, userBId).subscribe({
       next: ({ roomId }) => {
         this.router.navigate(['/chat/', roomId]);
