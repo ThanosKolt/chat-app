@@ -1,5 +1,6 @@
 /server/dist
 /server/node_modules
+/server/.env
 
 /client/.angular
 /client/node_modules
