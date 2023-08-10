@@ -11,6 +11,7 @@ import { Message, User } from 'src/types';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/shared/authService/auth.service';
+import { AudioService } from 'src/app/shared/audioService/audio.service';
 
 @Component({
   selector: 'app-chat-main',
@@ -35,7 +36,8 @@ export class ChatMainComponent {
   constructor(
     private chatService: ChatService,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private audioService: AudioService
   ) {}
 
   @HostListener('window:resize', ['$event'])
@@ -143,6 +145,7 @@ export class ChatMainComponent {
       .getNewMessage()
       .subscribe((message) => {
         this.messageList.push(message);
+        this.audioService.playMessageNotification();
       });
 
     this.subscriptions.push(newMessageSub);
