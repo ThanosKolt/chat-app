@@ -145,7 +145,9 @@ export class ChatMainComponent {
       .getNewMessage()
       .subscribe((message) => {
         this.messageList.push(message);
-        this.audioService.playMessageNotification();
+        if (message.fromId !== this.currentUser.id) {
+          this.audioService.playMessageNotification();
+        }
       });
 
     this.subscriptions.push(newMessageSub);
