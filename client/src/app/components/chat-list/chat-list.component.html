@@ -1,10 +1,12 @@
 <div class="flex flex-col items-center">
-  <!-- History List -->
   <h1 *ngIf="!users" class="text-4xl mt-2">History</h1>
   <ul class="flex flex-col my-2 w-full">
     <li
       *ngFor="let item of list"
       class="text-3xl border-b w-full flex h-16 hover:bg-slate-50"
+      [ngStyle]="
+        !users && !item.lastMessage ? { display: 'none' } : { display: 'flex' }
+      "
     >
       <button
         (click)="getChatRoom(currentUser.id, item.user.id)"
@@ -18,17 +20,5 @@
         </p>
       </button>
     </li>
-    <!-- Search User List -->
-    <!-- <li
-      *ngFor="let user of users"
-      class="text-xl border-b w-full h-12 flex justify-center items-center"
-    >
-      <button
-        (click)="getChatRoomId(currentUser.id, user.id)"
-        class="h-full w-full hover:bg-slate-50"
-      >
-        {{ user.username }}
-      </button>
-    </li> -->
   </ul>
 </div>

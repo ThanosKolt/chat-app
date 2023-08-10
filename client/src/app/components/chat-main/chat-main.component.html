@@ -5,7 +5,7 @@
         *ngFor="let message of messageList"
         class="rounded-lg w-fit px-2 py-1 m-4 text-lg"
         [ngClass]="
-          message.fromId === currentUserId
+          message.fromId === currentUser.id
             ? 'self-end bg-blue-500 text-gray-100'
             : 'self-start bg-gray-100 text-black'
         "

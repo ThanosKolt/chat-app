@@ -7,9 +7,10 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ChatService } from '../../shared/chatService/chat.service';
-import { Message } from 'src/types';
+import { Message, User } from 'src/types';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from 'src/app/shared/authService/auth.service';
 
 @Component({
   selector: 'app-chat-main',
@@ -17,7 +18,6 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./chat-main.component.css'],
 })
 export class ChatMainComponent {
-  // @Input('id')
   roomId?: string;
 
   @ViewChild('form')
@@ -26,19 +26,16 @@ export class ChatMainComponent {
   @ViewChild('chatDiv')
   chatDiv?: ElementRef<HTMLDivElement>;
 
-  toUser: {
-    id: number;
-    username: string;
-  } = { id: -1, username: '' };
-  currentUserId: number = -1;
-  currentUserUsername: string = '';
+  toUser: User = { id: -1, username: '' };
+  currentUser: User = { id: -1, username: '' };
   newMessage: string = '';
   messageList: Message[] = [];
   subscriptions: Subscription[] = [];
 
   constructor(
     private chatService: ChatService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   @HostListener('window:resize', ['$event'])
@@ -68,36 +65,15 @@ export class ChatMainComponent {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe((paramMap) => {
-      if (paramMap.get('id') !== null) {
-        this.roomId = paramMap.get('id')!;
-        this.chatService.joinRoom(this.roomId);
-        const getRoomMessageSub = this.chatService
-          .getRoomMessages(this.roomId)
-          .subscribe((data) => {
-            this.messageList = [];
-            data.forEach((message) => this.messageList.push(message));
-          });
-        this.subscriptions.push(getRoomMessageSub);
-      }
+    this.joinRoom();
+    this.getRoomMessages();
+    this.getNewMessage();
+
+    this.authService.currentUser.subscribe((data) => {
+      this.currentUser = { id: data.id, username: data.username };
     });
-    const newMessageSub = this.chatService
-      .getNewMessage()
-      .subscribe((message) => {
-        this.messageList.push(message);
-      });
 
-    this.subscriptions.push(newMessageSub);
-
-    if (
-      localStorage.getItem('currentUserId') !== null &&
-      localStorage.getItem('currentUserUsername') !== null
-    ) {
-      this.currentUserId = Number(localStorage.getItem('currentUserId'));
-      this.currentUserUsername = localStorage.getItem('currentUserUsername')!;
-    }
-
-    this.getToUserId();
+    this.getToUser();
   }
 
   updateScroll() {
@@ -113,24 +89,24 @@ export class ChatMainComponent {
       const sendMessageSub = this.chatService
         .sendMessage({
           roomId: this.roomId,
-          fromId: this.currentUserId,
+          fromId: this.currentUser.id,
           toId: this.toUser.id,
           text: this.newMessage,
         })
-        .subscribe(() => console.log('subbed to sendmessage'));
+        .subscribe();
       this.subscriptions.push(sendMessageSub);
     }
     this.newMessage = '';
   }
 
-  getToUserId() {
+  getToUser() {
     if (this.roomId !== undefined) {
       const getRoomInfoSub = this.chatService
         .getRoomInfo(this.roomId)
         .subscribe({
           next: (data) => {
             data.users.forEach((user) => {
-              if (user.id !== this.currentUserId) {
+              if (user.id !== this.currentUser.id) {
                 this.toUser.id = user.id;
                 this.toUser.username = user.username;
               }
@@ -139,5 +115,36 @@ export class ChatMainComponent {
         });
       this.subscriptions.push(getRoomInfoSub);
     }
+  }
+
+  joinRoom() {
+    this.route.paramMap.subscribe((paramMap) => {
+      if (paramMap.get('id') !== null) {
+        this.roomId = paramMap.get('id')!;
+        this.chatService.joinRoom(this.roomId);
+      }
+    });
+  }
+
+  getRoomMessages() {
+    if (this.roomId !== undefined) {
+      const getRoomMessageSub = this.chatService
+        .getRoomMessages(this.roomId)
+        .subscribe((data) => {
+          this.messageList = [];
+          data.forEach((message) => this.messageList.push(message));
+        });
+      this.subscriptions.push(getRoomMessageSub);
+    }
+  }
+
+  getNewMessage() {
+    const newMessageSub = this.chatService
+      .getNewMessage()
+      .subscribe((message) => {
+        this.messageList.push(message);
+      });
+
+    this.subscriptions.push(newMessageSub);
   }
 }
