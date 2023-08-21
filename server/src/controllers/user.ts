@@ -6,6 +6,11 @@ import status from "http-status";
 import { generateToken } from "../utils/jwt";
 import { Like } from "typeorm";
 import { StatusCodes } from "http-status-codes";
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../errors/errors";
 
 interface RequestBody<T> extends Express.Request {
   body: T;
@@ -27,10 +32,7 @@ export const getUserById = async (req: Request, res: Response) => {
   const id: number = Number(req.params.id);
   const user = await manager.findOne(User, { where: { id } });
   if (!user) {
-    res
-      .status(status.NOT_FOUND)
-      .json({ error: { msg: `No user with id: ${id} found` } });
-    return;
+    throw new NotFoundError(`User with id: ${id} not found`);
   }
   res.status(status.OK).json(user);
 };
@@ -40,17 +42,11 @@ export const udpateUser = async (req: Request, res: Response) => {
   const { username } = req.body;
   const user = await manager.findOneBy(User, { id });
   if (!user) {
-    res
-      .status(status.NOT_FOUND)
-      .json({ error: { msg: `No user found with id: ${id} found` } });
-    return;
+    throw new NotFoundError(`No user found with id: ${id} found`);
   }
   const usernameExist = await manager.findOneBy(User, { username });
   if (usernameExist) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ error: { msg: `This username is already being used` } });
-    return;
+    throw new BadRequestError(`This username is already being used`);
   }
   const response = await manager.update(User, { id }, { username });
   res.status(status.OK).json({ response });
@@ -60,52 +56,34 @@ export const getUserByUsername = async (req: Request, res: Response) => {
   const { username } = req.params;
   const user = await manager.findOneBy(User, { username });
   if (!user) {
-    res
-      .status(status.NOT_FOUND)
-      .json({ error: { msg: `No user with username: ${username} found` } });
-    return;
+    throw new NotFoundError(`No user with username: ${username} found`);
   }
   res.status(status.OK).json({ user });
 };
 
 export const register = async (req: RequestBody<Register>, res: Response) => {
   const { username, password } = req.body;
-  try {
-    const userExists = await manager.findOne(User, { where: { username } });
-    if (userExists) {
-      res
-        .status(status.BAD_REQUEST)
-        .json({ error: { msg: `user ${username} already exists` } });
-      return;
-    }
-    if (password.trim().length < 5) {
-      res.status(status.BAD_REQUEST).json({
-        error: { msg: "password needs to be longer than 5 characters" },
-      });
-      return;
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await manager.insert(User, { username, password: hashedPassword });
-    const user = await manager.findOne(User, {
-      where: { username },
-    });
-    res.status(status.CREATED).json({ user });
-  } catch (error) {
-    res
-      .status(status.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something went wrong" } });
+  const userExists = await manager.findOne(User, { where: { username } });
+  if (userExists) {
+    throw new BadRequestError(`user ${username} already exists`);
   }
+  if (password.trim().length < 5) {
+    throw new BadRequestError("password needs to be longer than 5 characters");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await manager.insert(User, { username, password: hashedPassword });
+  const user = await manager.findOne(User, {
+    where: { username },
+  });
+  res.status(status.CREATED).json({ user });
 };
 
 export const login = async (req: RequestBody<Register>, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ error: { msg: "Invalid Credentials" } });
-    return;
+    throw new UnauthorizedError("Invalid Credentials");
   }
   const user = await manager.findOne(User, {
     where: {
@@ -118,17 +96,13 @@ export const login = async (req: RequestBody<Register>, res: Response) => {
     },
   });
   if (!user) {
-    res
-      .status(status.BAD_REQUEST)
-      .json({ error: { msg: `User ${username} doesn't exist` } });
-    return;
+    throw new NotFoundError(`User ${username} doesn't exist`);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    res.status(status.UNAUTHORIZED).json("wrong credentials");
-    return;
+    throw new UnauthorizedError("Wrong credentials");
   }
 
   const token = generateToken({ id: user.id, username: user.username });
@@ -139,25 +113,15 @@ export const login = async (req: RequestBody<Register>, res: Response) => {
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    await manager.delete(User, id);
-    res.status(status.OK).json({ msg: "success" });
-  } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({ msg: "delete failed" });
-  }
+  const { id } = req.params;
+  await manager.delete(User, id);
+  res.status(status.OK).json({ msg: "success" });
 };
 
 export const searchUser = async (req: Request, res: Response) => {
-  try {
-    const input: string = req.body.input;
-    let result = await manager.find(User, {
-      where: { username: Like(`%${input}%`) },
-    });
-    res.status(StatusCodes.OK).json(result);
-  } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: { msg: "Something went wrong" } });
-  }
+  const input: string = req.body.input;
+  let result = await manager.find(User, {
+    where: { username: Like(`%${input}%`) },
+  });
+  res.status(StatusCodes.OK).json(result);
 };

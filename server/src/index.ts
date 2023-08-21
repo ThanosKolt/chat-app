@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "express-async-errors";
 import { ConnectDb } from "./data-source";
 import express from "express";
 import { config } from "dotenv";
@@ -10,6 +11,7 @@ import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { MessageType } from "./types";
+import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
 const server = createServer(app);
@@ -30,6 +32,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
+app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
 

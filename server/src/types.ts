@@ -4,3 +4,9 @@ export interface MessageType {
   toId: number;
   roomId: string;
 }
+
+export interface ICustomError {
+  message: string;
+  name: string;
+  status: number;
+}
