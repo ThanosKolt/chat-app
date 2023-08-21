@@ -9,13 +9,18 @@ import {
   udpateUser,
   searchUser,
 } from "../controllers/user";
+import { auth } from "../middleware/auth";
 const router = Router();
 
-router.route("/").get(getUsers);
-router.route("/:id").get(getUserById).delete(deleteUser).put(udpateUser);
-router.route("/username/:username").get(getUserByUsername);
+router.route("/").get(auth, getUsers);
+router
+  .route("/:id")
+  .get(auth, getUserById)
+  .delete(auth, deleteUser)
+  .put(auth, udpateUser);
+router.route("/username/:username").get(auth, getUserByUsername);
 router.post("/login", login);
 router.post("/register", register);
-router.post("/search", searchUser);
+router.post("/search", auth, searchUser);
 
 export default router;

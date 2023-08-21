@@ -10,5 +10,6 @@ export function errorHandler(
   if (err instanceof CustomError) {
     return res.status(err.status).json({ error: { message: err.message } });
   }
+  console.log("error:" + err.message);
   return res.status(500).json({ error: { message: "something went worng" } });
 }

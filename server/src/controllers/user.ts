@@ -11,10 +11,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../errors/errors";
-
-interface RequestBody<T> extends Express.Request {
-  body: T;
-}
+import { RequestBody } from "../types";
 
 interface Register {
   username: string;
