@@ -23,10 +23,7 @@ export class LoginComponent {
   ) {}
 
   ngOnInit() {
-    if (
-      localStorage.getItem('currentUserId') &&
-      localStorage.getItem('currentUserUsername')
-    ) {
+    if (this.authService.isLoggedIn) {
       this.router.navigate(['/']);
     }
   }

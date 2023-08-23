@@ -15,6 +15,10 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+  getToken() {
+    return localStorage.getItem('token');
+  }
+
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>('http://localhost:5000/api/user/login', {
