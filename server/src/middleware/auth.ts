@@ -13,6 +13,7 @@ interface UserPayload {
 
 export const auth = (req: Request, res: Response, next: NextFunction) => {
   const headers = req.headers.authorization;
+  console.log(headers);
   if (headers === null || !headers?.startsWith("Bearer")) {
     throw new UnauthorizedError("Invalid Token");
   }
@@ -24,7 +25,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       iat,
     } = jwt.verify(
       token,
-      process.env.jwt_secret! || "MISSING_SECRET"
+      process.env.JWT_SECRET! || "MISSING_SECRET"
     ) as UserPayload;
     req.user = { id, username };
   } catch (error) {

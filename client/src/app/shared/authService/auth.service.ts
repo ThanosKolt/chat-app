@@ -82,7 +82,7 @@ export class AuthService {
     localStorage.setItem('currentUserId', id);
   }
 
-  private clearCredentialsFromLocalStorage() {
+  clearCredentialsFromLocalStorage() {
     localStorage.removeItem('currentUserUsername');
     localStorage.removeItem('currentUserId');
     localStorage.removeItem('token');

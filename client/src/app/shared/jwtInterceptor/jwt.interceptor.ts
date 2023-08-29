@@ -29,6 +29,7 @@ export class JwtInterceptor implements HttpInterceptor {
               // redirect will probably change to modal in the future
               this.router.navigate(['/login']);
               this.authService.isLoggedIn.next(false);
+              this.authService.clearCredentialsFromLocalStorage();
             }
           }
         },
